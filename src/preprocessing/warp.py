@@ -1,10 +1,15 @@
 from preprocessing.roi import getLargestContour
 import cv2 as cv
 import numpy as np
+from preprocessing.roi import *
 
 def warp_image(cropped_img):
-    gray_img = cv.cvtColor(cropped_img, cv.COLOR_RGB2GRAY)
-    contour_in_cropped = getLargestContour(gray_img)
+    # Apply sharpening to RGB image first
+    sharpened = unsharp_highpass(cropped_img)
+    
+    canny = auto_canny(sharpened)
+    morph = morph_close(canny[0], kernel_size=3, iterations=6)
+    contour_in_cropped = getLargestContour(morph)
     # src points from contour
     src = get_quadrilateral_from_contour(contour_in_cropped)  # TL,TR,BR,BL
 

@@ -7,7 +7,7 @@ Follow these steps to set up and run the project.
 1\. Create a virtual environment
 
 ```
-python -m ven venv
+python -m venv venv
 ```
 
 2\. Activate the virtual environment (from project root)
