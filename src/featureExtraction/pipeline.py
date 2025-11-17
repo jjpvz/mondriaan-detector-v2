@@ -9,30 +9,30 @@ from featureExtraction.standardDeviation import compute_color_std
 from featureExtraction.numberOfSquares import count_number_of_colored_squares, count_number_of_squares
 
 def extract_features(i, name, class_name, img, red_mask, yellow_mask, blue_mask) -> dict[str, float]:
-    aspect_ratio, center, diagonal = compute_aspect_ratio(img, False)
+    aspect_ratio, center, diagonal = compute_aspect_ratio(img, True)
 
-    red_com = compute_center_of_mass(img, red_mask, False)
-    yellow_com = compute_center_of_mass(img, yellow_mask, False)
-    blue_com = compute_center_of_mass(img, blue_mask, False)
+    red_com = compute_center_of_mass(img, red_mask, True)
+    yellow_com = compute_center_of_mass(img, yellow_mask, True)
+    blue_com = compute_center_of_mass(img, blue_mask, True)
 
-    red_dist = compute_euclidian_distance(img, red_com, center, diagonal, False)
-    yellow_dist = compute_euclidian_distance(img, yellow_com, center, diagonal, False)
-    blue_dist = compute_euclidian_distance(img, blue_com, center, diagonal, False)
+    red_dist = compute_euclidian_distance(img, red_com, center, diagonal, True)
+    yellow_dist = compute_euclidian_distance(img, yellow_com, center, diagonal, True)
+    blue_dist = compute_euclidian_distance(img, blue_com, center, diagonal, True)
 
-    red_pct = compute_color_percentage(img, red_mask, False)
-    yellow_pct = compute_color_percentage(img, yellow_mask, False)
-    blue_pct = compute_color_percentage(img, blue_mask, False)
+    red_pct = compute_color_percentage(img, red_mask, True)
+    yellow_pct = compute_color_percentage(img, yellow_mask, True)
+    blue_pct = compute_color_percentage(img, blue_mask, True)
 
-    unique_hues = compute_unique_hues(img, 0.01, False)
-    color_diversity = compute_color_diversity(img, 30, 30, False)
-    hue_variance = compute_hue_variance(img, False)
+    unique_hues = compute_unique_hues(img, 0.01, True)
+    color_diversity = compute_color_diversity(img, 30, 30, True)
+    hue_variance = compute_hue_variance(img, True)
 
-    red_std = compute_color_std(img, red_mask, False)
-    yellow_std = compute_color_std(img, yellow_mask, False)
-    blue_std = compute_color_std(img, blue_mask, False)
+    red_std = compute_color_std(img, red_mask, True)
+    yellow_std = compute_color_std(img, yellow_mask, True)
+    blue_std = compute_color_std(img, blue_mask, True)
 
-    number_of_colored_squares = count_number_of_colored_squares(img, red_mask, yellow_mask, blue_mask, 0, False)
-    number_of_squares = count_number_of_squares(img, 0, False)
+    number_of_colored_squares = count_number_of_colored_squares(img, red_mask, yellow_mask, blue_mask, 0, True)
+    number_of_squares = count_number_of_squares(img, 0, True)
 
     features = {
         "id": i,
