@@ -1,13 +1,14 @@
 from analyze.boxplot import plot_feature_boxplot
+from analyze.correlationHeatmap import show_correlation_heatmap
 from analyze.histogram import plot_feature_distribution
 from analyze.pca import plot_descriptor_pca
 from analyze.scatterplot import plot_feature_scatter
 
 def analyze_features(dataframe, hog_features, dct_features, orb_features, hist_features):
     print(dataframe)
+    # print(dataframe.describe())
 
     # features_to_use = dataframe.drop(columns=['id', 'filename', 'class'])
-    # print(dataframe.describe())
 
     # show_correlation_heatmap(features_to_use)
 
