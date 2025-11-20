@@ -14,7 +14,7 @@ def create_mask(img_rgb, h_range, s_min, v_min, invert=False):
         mask = cv.bitwise_or(mask, m)
 
     # clean up mask with morphological operations
-    kernel = cv.getStructuringElement(cv.MORPH_RECT, (7,7))
+    kernel = cv.getStructuringElement(cv.MORPH_RECT, (3,3))
     mask = cv.morphologyEx(mask, cv.MORPH_CLOSE, kernel, iterations=1)
     mask = cv.morphologyEx(mask, cv.MORPH_OPEN,  kernel, iterations=1)
     if invert:

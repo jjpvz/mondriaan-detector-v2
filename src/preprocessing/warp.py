@@ -8,7 +8,7 @@ def warp_image(cropped_img):
     sharpened = unsharp_highpass(cropped_img)
     
     canny = auto_canny(sharpened)
-    morph = morph_close(canny[0], kernel_size=3, iterations=6)
+    morph = morph_close(canny[0], kernel_size=3, iterations=1)
     contour_in_cropped = getLargestContour(morph)
     # src points from contour
     src = get_quadrilateral_from_contour(contour_in_cropped)  # TL,TR,BR,BL

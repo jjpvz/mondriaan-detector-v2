@@ -1,10 +1,21 @@
 from helpers.display import display_image
 from preprocessing.warp import warp_image
 from preprocessing.roi import *
+from preprocessing.whitebalance import apply_fixed_wb, gains
+from preprocessing.lightCorrection import licht_correction
+
 
 
 def preprocess_image(img_rgb, visualize: bool = False):
-    sharped = unsharp_highpass(img_rgb)
+    if visualize:
+        display_image(img_rgb)
+   
+    balanced_img = apply_fixed_wb(img_rgb, gains)
+
+    if visualize:
+        display_image(balanced_img)
+
+    sharped = unsharp_highpass(balanced_img)
 
     if visualize:
         display_image(sharped)
@@ -14,11 +25,12 @@ def preprocess_image(img_rgb, visualize: bool = False):
     if visualize:
         display_image(canny[0])
 
-    morph = morph_close(canny[0], kernel_size=3, iterations=6)
+    morph = morph_close(canny[0], kernel_size=3, iterations=1)
 
     if visualize:
         display_image(morph)
     contour = getLargestContour(morph)
+    
     cropped_img = extract_roi(img_rgb, contour)
 
     if visualize:
@@ -28,5 +40,5 @@ def preprocess_image(img_rgb, visualize: bool = False):
 
     if visualize:
         display_image(warped_img)
-    
+
     return warped_img

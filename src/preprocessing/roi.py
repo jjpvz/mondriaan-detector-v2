@@ -47,8 +47,15 @@ def morph_open(binary, kernel_size, iterations):
     opened = cv.morphologyEx(binary, cv.MORPH_OPEN, kernel, iterations=iterations)
     return opened
 
-def unsharp_highpass(bgr, radius=3, amount=1.2):
-    #Edge boost via unsharp mask in BGR.
-    
-    blur = cv.GaussianBlur(bgr, (0, 0), radius)
+def highpass_filter(bgr, radius=3, gain=3.0):
+    #gray = cv.cvtColor(bgr, cv.COLOR_BGR2GRAY).astype(np.float32)
+    blur = cv.GaussianBlur(bgr, (21,21), radius)
+    hp = bgr - blur + 127
+   # hp = hp * gain
+    hp_norm = cv.normalize(hp, None, alpha=0, beta=255,
+                           norm_type=cv.NORM_MINMAX)
+    return hp_norm.astype(np.uint8)
+
+def unsharp_highpass(bgr, radius=3, amount=1.2): #Edge boost via unsharp mask in BGR. 
+    blur = cv.GaussianBlur(bgr, (0, 0), radius) 
     return cv.addWeighted(bgr, 1 + amount, blur, -amount, 0)
