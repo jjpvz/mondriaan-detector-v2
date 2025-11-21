@@ -22,14 +22,14 @@ if __name__ == "__main__":
 
     for i, (image, name, class_name) in enumerate(images):
 
-        image = preprocess_image(image, False)
+        image = preprocess_image(image, True)
         
         red_mask, yellow_mask, blue_mask = segment_colors(image, False)
 
-        features_list.append(extract_features(i, name, class_name, image, red_mask, yellow_mask, blue_mask))
+        #features_list.append(extract_features(i, name, class_name, image, red_mask, yellow_mask, blue_mask))
         
         # hist_features_list.append(compute_block_histogram(image))
-        dct_features_list.append(compute_dct_features(image, 8, True))
+        #dct_features_list.append(compute_dct_features(image, 8, True))
         # hog_features_list.append(compute_hog_features(image, False))
         # orb_features_list.append(compute_orb_features(image, False))
 

@@ -41,4 +41,9 @@ def preprocess_image(img_rgb, visualize: bool = False):
     if visualize:
         display_image(warped_img)
 
-    return warped_img
+    light_corrected = licht_correction(warped_img)
+    if visualize:
+        display_image(light_corrected)
+
+
+    return light_corrected
