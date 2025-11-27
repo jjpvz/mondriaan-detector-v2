@@ -59,3 +59,11 @@ def highpass_filter(bgr, radius=3, gain=3.0):
 def unsharp_highpass(bgr, radius=3, amount=1.2): #Edge boost via unsharp mask in BGR. 
     blur = cv.GaussianBlur(bgr, (0, 0), radius) 
     return cv.addWeighted(bgr, 1 + amount, blur, -amount, 0)
+
+def remove_horizontal_borders(img, perc=0.02):
+    h, w = img.shape[:2]
+    border = int(h*perc)
+    cleaned = img.copy()
+    cleaned[:border, :] = 0
+    cleaned[-border:, :] = 0
+    return cleaned
