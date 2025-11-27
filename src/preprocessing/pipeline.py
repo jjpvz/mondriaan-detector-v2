@@ -4,8 +4,6 @@ from preprocessing.roi import *
 from preprocessing.whitebalance import apply_fixed_wb, gains
 from preprocessing.lightCorrection import licht_correction
 
-
-
 def preprocess_image(img_rgb, visualize: bool = False):
     if visualize:
         display_image(img_rgb)
@@ -31,6 +29,7 @@ def preprocess_image(img_rgb, visualize: bool = False):
 
     if visualize:
         display_image(morph)
+
     contour = getLargestContour(morph)
     
     cropped_img = extract_roi(img_rgb, contour)
@@ -44,8 +43,8 @@ def preprocess_image(img_rgb, visualize: bool = False):
         display_image(warped_img)
 
     light_corrected = licht_correction(warped_img)
+
     if visualize:
         display_image(light_corrected)
-
 
     return light_corrected
