@@ -25,7 +25,9 @@ def preprocess_image(img_rgb, visualize: bool = False):
     if visualize:
         display_image(canny[0])
 
-    morph = morph_close(canny[0], kernel_size=3, iterations=1)
+    no_borders = remove_horizontal_borders(canny[0], perc=0.17)
+
+    morph = morph_close(no_borders, kernel_size=3, iterations=3)
 
     if visualize:
         display_image(morph)
