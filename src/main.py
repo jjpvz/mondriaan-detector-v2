@@ -26,19 +26,19 @@ def apply_machine_learning():
 
     for i, (image, name, class_name) in enumerate(images):
 
-        image = preprocess_image(image, True)
+        image = preprocess_image(image, False)
         
-        # red_mask, yellow_mask, blue_mask = segment_colors(image, False)
+        red_mask, yellow_mask, blue_mask = segment_colors(image, False)
 
-        #features_list.append(extract_features(i, name, class_name, image, red_mask, yellow_mask, blue_mask))
+        features_list.append(extract_features(i, name, class_name, image, red_mask, yellow_mask, blue_mask))
         
         # hist_features_list.append(compute_block_histogram(image))
         #dct_features_list.append(compute_dct_features(image, 8, True))
         # hog_features_list.append(compute_hog_features(image, False))
         # orb_features_list.append(compute_orb_features(image, False))
 
-    # dataframe = pd.DataFrame(features_list)
-    # print(dataframe)
+    dataframe = pd.DataFrame(features_list)
+    print(dataframe)
     
     # analyze_features(dataframe, hog_features_list, dct_features_list, orb_features_list, hist_features_list)
 
@@ -72,7 +72,7 @@ def apply_deep_learning(images):
     test_loss, test_acc = model.evaluate(X_test, y_test, verbose=2)
     print(f'\nTest Nauwkeurigheid: {test_acc:.4f}')
 
-    predictions = model.predict(X_test)
+    predictions = model.predict(X_test)   
     most_probable_predictions = np.argmax(predictions, axis=1)
 
     print("\nVoorbeeld van voorspellingen op de testset:")
@@ -84,4 +84,5 @@ def apply_deep_learning(images):
 if __name__ == "__main__":
     images = load_images("fullset")
 
-    apply_deep_learning(images)
+   # apply_deep_learning(images)
+    apply_machine_learning()

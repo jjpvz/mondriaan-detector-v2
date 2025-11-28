@@ -3,12 +3,17 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from helpers.display import display_image
+from helpers.resize import resize_image
 
 def compute_hog_features(image, visualize: bool = False):
-    gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+    resized = resize_image(image, 128, 128)
+    gray = cv.cvtColor(resized, cv.COLOR_BGR2GRAY)
 
     hog = cv.HOGDescriptor()
     h = hog.compute(gray)
+
+    h = h.reshape(-1)
+    h = np.nan_to_num(h, nan=0.0, posinf=0.0, neginf=0.0)
 
     if visualize:
         # Compute gradients

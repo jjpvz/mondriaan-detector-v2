@@ -4,7 +4,7 @@ from helpers.display import display_image
 
 def compute_euclidian_distance(image, center_of_mass, image_center, image_diagonal, visualize: bool = False):
     if center_of_mass is None:
-        return np.nan
+        return 0.0
 
     distance = np.linalg.norm(np.array(center_of_mass) - np.array(image_center)) / image_diagonal
 

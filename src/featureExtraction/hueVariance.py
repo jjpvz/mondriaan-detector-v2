@@ -8,6 +8,9 @@ def compute_hue_variance(image, visualize: bool = False) -> float:
     h, s, v = cv.split(hsv)
     mask = (s > 30) & (v > 30)
 
+    if np.sum(mask) == 0:
+        return 0.0
+
     hue_variance = float(np.var(h[mask]))
 
     if visualize:

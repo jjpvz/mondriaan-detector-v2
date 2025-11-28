@@ -9,7 +9,7 @@ def compute_color_std(image: np.ndarray, mask: np.ndarray, visualize: bool = Fal
     masked_pixels = masked_img[mask > 0]
 
     if masked_pixels.size == 0:
-        return None
+        return 0.0
 
     std_r = np.std(masked_pixels[:, 0])
     std_g = np.std(masked_pixels[:, 1])

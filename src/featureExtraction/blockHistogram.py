@@ -1,7 +1,10 @@
 import cv2 as cv
 import numpy as np
 
+from helpers.resize import resize_image
+
 def compute_block_histogram(img, block_size=(50, 50), bins=16):
+    img = resize_image(img, 400, 400)
     h, w = img.shape[:2]
     features = []
 
@@ -17,6 +20,7 @@ def compute_block_histogram(img, block_size=(50, 50), bins=16):
             # Normalize histograms and flatten
             hist = np.concatenate([hist_h, hist_s, hist_v]).flatten()
             hist = hist / hist.sum() if hist.sum() > 0 else hist
+            hist = np.nan_to_num(hist, nan=0.0, posinf=0.0, neginf=0.0)
             features.extend(hist)
 
     return np.array(features)

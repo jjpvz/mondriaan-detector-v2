@@ -16,4 +16,6 @@ def compute_dct_features(image, block_size: int = 8, visualize: bool = False):
     dct_block = dct[:block_size, :block_size]
     features = dct_block.flatten()
 
+    features = np.nan_to_num(features, nan=0.0, posinf=0.0, neginf=0.0)
+
     return features

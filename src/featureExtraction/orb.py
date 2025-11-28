@@ -15,7 +15,7 @@ def compute_orb_features(image, visualize: bool = False, nfeatures: int = 500):
         display_image(img_kp, title="ORB Keypoints")
 
     if descriptors is None or len(descriptors) == 0:
-        feature_vector = np.zeros(32) 
+        feature_vector = np.zeros(64) 
     else:
         mean_desc = np.mean(descriptors, axis=0)
         std_desc = np.std(descriptors, axis=0)
