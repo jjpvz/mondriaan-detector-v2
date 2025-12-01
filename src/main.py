@@ -10,6 +10,7 @@ from helpers.display import display_image
 from preprocessing.pipeline import preprocess_image
 from segmentation.colorSegmentation import segment_colors
 from featureExtraction.pipeline import extract_features
+from machineLearning.Random_forest_train import train_random_forest, gridsearch_RF
 import pandas as pd
 import cv2 as cv
 from sklearn.model_selection import train_test_split
@@ -40,6 +41,9 @@ def apply_machine_learning():
     dataframe = pd.DataFrame(features_list)
     print(dataframe)
     
+    gs = gridsearch_RF(dataframe)
+    #dataframe.to_csv("data.csv", index=False)
+
     # analyze_features(dataframe, hog_features_list, dct_features_list, orb_features_list, hist_features_list)
 
 def apply_deep_learning(images):
