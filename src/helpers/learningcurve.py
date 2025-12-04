@@ -9,7 +9,7 @@ def plot_learning_curve(estimator, X, y, axes=None, ylim=None, cv=None,
     if axes is None:
         _, axes = plt.subplots(1, 1, figsize=(10, 5))
 
-    axes.set_title("Learning Curves (SVM, RBF Kernel)")
+    axes.set_title("Learning Curves (random Forest)")
     if ylim is not None:
         axes.set_ylim(*ylim)
     axes.set_xlabel("Training examples")

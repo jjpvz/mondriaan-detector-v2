@@ -67,3 +67,4 @@ def remove_horizontal_borders(img, perc=0.02):
     cleaned[:border, :] = 0
     cleaned[-border:, :] = 0
     return cleaned
+

@@ -1,4 +1,5 @@
 from analyze.pipeline import analyze_features
+from dataAcquisition.data_augmentation import augment_images
 from dataAcquisition.load import load_images
 from deepLearning.createModel import create_cnn_model
 from deepLearning.prepareData import prepare_data_for_dl
@@ -16,6 +17,7 @@ import cv2 as cv
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
 import numpy as np
+import joblib
 
 def apply_machine_learning():
     features_list = [] 
@@ -25,7 +27,15 @@ def apply_machine_learning():
 
     hist_features_list = []
 
-    for i, (image, name, class_name) in enumerate(images):
+    augmented_images = augment_images(
+        images, 
+        num_aug_per_image=20,
+    )
+
+    total_images = len(augmented_images)
+    print(f"\nFeature extraction gestart voor {total_images} afbeeldingen...")
+      
+    for i, (image, name, class_name) in enumerate(augmented_images):
 
         image = preprocess_image(image, False)
         
@@ -33,16 +43,26 @@ def apply_machine_learning():
 
         features_list.append(extract_features(i, name, class_name, image, red_mask, yellow_mask, blue_mask))
         
+        # Show progress
+        if total_images > 0:
+            progress = ((i + 1) / total_images) * 100
+            print(f"\rFeatures extraheren: {progress:.1f}% ({i + 1}/{total_images})", end="", flush=True)
+        
         # hist_features_list.append(compute_block_histogram(image))
         #dct_features_list.append(compute_dct_features(image, 8, True))
         # hog_features_list.append(compute_hog_features(image, False))
         # orb_features_list.append(compute_orb_features(image, False))
 
+    print()  # New line after progress
+    print("Feature extraction voltooid!\n")
+    
     dataframe = pd.DataFrame(features_list)
     print(dataframe)
     
-    gs = gridsearch_RF(dataframe)
+    model_rm = train_random_forest(dataframe)
     #dataframe.to_csv("data.csv", index=False)
+
+    joblib.dump(model_rm, "random_forest_model.joblib")
 
     # analyze_features(dataframe, hog_features_list, dct_features_list, orb_features_list, hist_features_list)
 
@@ -89,4 +109,5 @@ if __name__ == "__main__":
     images = load_images("fullset")
 
    # apply_deep_learning(images)
+
     apply_machine_learning()

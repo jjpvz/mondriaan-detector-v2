@@ -1,6 +1,6 @@
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import cross_val_score, train_test_split, ShuffleSplit, GridSearchCV
-from sklearn.metrics import ConfusionMatrixDisplay, classification_report, confusion_matrix
+from sklearn.model_selection import cross_val_score, train_test_split, ShuffleSplit, GridSearchCV, RandomizedSearchCV
+from sklearn.metrics import ConfusionMatrixDisplay, classification_report, confusion_matrix, accuracy_score
 from sklearn.preprocessing import LabelEncoder
 from helpers.learningcurve import plot_learning_curve
 import pandas as pd
@@ -21,12 +21,17 @@ def train_random_forest(df):
         stratify=Y)
 
     ML_model = RandomForestClassifier(
-        n_estimators = 200,
-        max_depth = None,
+        n_estimators = 100,
+        max_depth = 20,
         min_samples_split = 2,
         min_samples_leaf = 1,
         n_jobs = -1,
-        random_state = 42
+        random_state = 42,
+        bootstrap = False,
+        criterion = "entropy",
+        class_weight = "balanced",
+        ccp_alpha = 0.001,
+        max_features="sqrt"
     )
 
     ML_model.fit(X_train, Y_train)
@@ -49,9 +54,10 @@ def train_random_forest(df):
     print(f"Cross-validation scores: {cv_scores}")
     print(f"Mean CV accuracy: {np.mean(cv_scores):.4f} (+/- {np.std(cv_scores) * 2:.4f})")
 
-    cv = ShuffleSplit(n_splits=100, test_size=0.2, random_state=42)
-    plt = plot_learning_curve(ML_model, X_train, Y_train, cv=cv, n_jobs=-1)
-    plt.show()
+    # Learning curve - reduced splits and sequential processing to avoid memory issues
+    cv = ShuffleSplit(n_splits=10, test_size=0.2, random_state=42)  # Reduced from 100 to 10
+    learning_curve_plt = plot_learning_curve(ML_model, X_train, Y_train, cv=cv, n_jobs=-1)  
+    learning_curve_plt.show()
 
     return ML_model
 
@@ -71,31 +77,60 @@ def gridsearch_RF(df):
         stratify=Y)
 
     rf = RandomForestClassifier(
-    n_jobs=-1,
+    n_jobs=1,
     random_state=42
 )
     
     param_grid = {
-        "n_estimators": [100, 200, 300, 400],
-        "max_depth": [None, 10, 20, 30],
-        "min_samples_split": [2, 5, 10],
-        "min_samples_leaf": [1, 2, 4],
-        "max_features": ["auto", "sqrt", "log2"]
+        "n_estimators": [100, 200],
+        "max_depth": [20, 30],
+        "min_samples_split": [2, 3],
+        "min_samples_leaf": [1, 2],
+        "max_features": ["sqrt"],
+        "bootstrap": [True, False],
+        "criterion": ["entropy"],
+        "class_weight": ["balanced"],
+        "ccp_alpha": [0.01, 0.001]
     }
+
 
     grid_search = GridSearchCV(
         estimator=rf,
         param_grid=param_grid,
-        cv=3,  # return to 5 when dataset is bigger trough data augmentation
-        n_jobs=-1,
+        cv=3,
+        n_jobs=-1,  
         scoring="accuracy",
         verbose=2
     )
+    
 
     grid_search.fit(X_train, Y_train)
 
     print(f"Best parameters found: {grid_search.best_params_}")
     print(f"Best cross-validation accuracy: {grid_search.best_score_:.4f}")
+
+        # ---- ==> hier begint de overfitting-check <== ----
+    best_model = grid_search.best_estimator_
+
+    # Train-accuracy
+    y_train_pred = best_model.predict(X_train)
+    train_acc = accuracy_score(Y_train, y_train_pred)
+
+    # Test-accuracy
+    y_test_pred = best_model.predict(X_test)
+    test_acc = accuracy_score(Y_test, y_test_pred)
+
+    print(f"Train accuracy: {train_acc:.4f}")
+    print(f"Test accuracy:  {test_acc:.4f}")
+    print("Classification report (test):")
+    print(classification_report(Y_test, y_test_pred))
+    print("Confusion matrix (test):")
+    print(confusion_matrix(Y_test, y_test_pred))
+
+    plot_learning_curve(best_model, X_train, Y_train, cv=5, n_jobs=-1)
+    plt.show()
+
+
 
     return None
 

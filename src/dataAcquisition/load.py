@@ -6,8 +6,9 @@ from helpers.resize import resize_image
 import numpy as np
 
 def load_images(mode: Literal["subset", "fullset"] = "subset", 
-                standard_width: int = 512,
-                standard_height: int = 512
+                standard_width: int = 1920,
+                standard_height: int = 1080,
+                show_progress: bool = True
     ) -> List[Tuple[np.ndarray, str]]:
     
     if mode not in {"subset", "fullset"}:
@@ -39,12 +40,27 @@ def load_images(mode: Literal["subset", "fullset"] = "subset",
         print(f"No image files found in {folder_path}")
         return []
 
+    if show_progress:
+        print(f"Gevonden {len(files)} bestanden om te verwerken...")
+
     imgs_rgb = []
-    for f in files:
+    total_files = len(files)
+    
+    for i, f in enumerate(files):
         img = cv.imread(str(f))
-        img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
-        img_resized = resize_image(img, standard_width, standard_height)
-        class_name = f.parent.relative_to(folder_path).parts[0]
-        imgs_rgb.append((img_resized, f.name, class_name))
+        if img is not None:
+            img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+            img_resized = resize_image(img, standard_width, standard_height)
+            class_name = f.parent.relative_to(folder_path).parts[0]
+            imgs_rgb.append((img_resized, f.name, class_name))
+            
+            # Show progress
+            if show_progress and total_files > 0:
+                progress = ((i + 1) / total_files) * 100
+                print(f"\rAfbeeldingen laden, verkleinen en converteren: {progress:.1f}% ({i + 1}/{total_files})", end="", flush=True)
+
+    if show_progress:
+        print()  # New line after progress
+        print("Import, resize en conversie voltooid!")
 
     return imgs_rgb

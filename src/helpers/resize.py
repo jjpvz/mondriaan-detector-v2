@@ -5,6 +5,11 @@ def resize_image(img, standard_width, standard_height):
     # check orientation and rotate if neccesary
 
     h, w = img.shape[:2]
+    
+    # Validate image dimensions
+    if h <= 0 or w <= 0:
+        raise ValueError(f"Invalid image dimensions: {w}x{h}")
+    
     if h > w:  # portrait image
         img = cv.rotate(img, cv.ROTATE_90_CLOCKWISE)
         h, w = img.shape[:2]
@@ -15,6 +20,10 @@ def resize_image(img, standard_width, standard_height):
     # New dimensions after scaling
     new_w = int(w * scale)
     new_h = int(h * scale)
+    
+    # Ensure new dimensions are at least 1 pixel
+    new_w = max(1, new_w)
+    new_h = max(1, new_h)
 
     # Resize with same aspect ratio
     resized = cv.resize(img, (new_w, new_h))
