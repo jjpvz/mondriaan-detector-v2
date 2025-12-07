@@ -18,6 +18,11 @@ from sklearn.model_selection import train_test_split
 import tensorflow as tf
 import numpy as np
 import joblib
+#from deepLearning.transferMobileNetV2 import create_transfer_model
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.metrics import confusion_matrix
+from deepLearning.transferEfficientNetB0  import create_transfer_model_efficientnet
 
 def apply_machine_learning():
     features_list = [] 
@@ -76,7 +81,9 @@ def apply_deep_learning(images):
     print(f"Totale dataset vorm (X): {X.shape}") 
     print(f"Aantal klassen: {num_classes}")
 
-    model = create_cnn_model(input_shape, num_classes)
+    # model = create_cnn_model(input_shape, num_classes)
+    # model = create_transfer_model(num_classes, input_shape=input_shape) # MobileNetV2
+    model = create_transfer_model_efficientnet(num_classes, input_shape=input_shape) #EfficientNetB0
 
     model.compile(optimizer='adam',
                 loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False), # Gebruik SC_Crossentropy voor integer labels
@@ -92,7 +99,20 @@ def apply_deep_learning(images):
         epochs=20,         
         validation_split=0.1,
         shuffle=True)
-    
+        # --- Learning curve ---
+    plt.figure(figsize=(10, 5))
+    plt.plot(history.history['loss'], label='Training loss')
+    plt.plot(history.history['val_loss'], label='Validation loss')
+    plt.plot(history.history['accuracy'], label='Training accuracy')
+    plt.plot(history.history['val_accuracy'], label='Validation accuracy')
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss / Accuracy")
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+
     test_loss, test_acc = model.evaluate(X_test, y_test, verbose=2)
     print(f'\nTest Nauwkeurigheid: {test_acc:.4f}')
 
@@ -103,11 +123,26 @@ def apply_deep_learning(images):
     for i in range(5):
         print(f"Werkelijke label: {class_names[y_test[i]]} (Index: {y_test[i]})")
         print(f"Voorspeld label: {class_names[most_probable_predictions[i]]} (Index: {most_probable_predictions[i]})\n")
+    
+    # --- Confusion matrix ---
+    cm = confusion_matrix(y_test, most_probable_predictions, normalize='true')
 
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(
+        cm,
+        annot=True,
+        cmap="Blues",
+        xticklabels=class_names,
+        yticklabels=class_names
+    )
+    plt.xlabel("Predicted")
+    plt.ylabel("True")
+    plt.title("Normalized Confusion Matrix (testset)")
+    plt.tight_layout()
+    plt.show()
 
 if __name__ == "__main__":
     images = load_images("fullset")
 
-   # apply_deep_learning(images)
-
-    apply_machine_learning()
+    apply_deep_learning(images)
+    #apply_machine_learning()
