@@ -4,6 +4,7 @@ import cv2 as cv
 import configparser
 from helpers.resize import resize_image
 import numpy as np
+import joblib
 
 def load_images(mode: Literal["subset", "fullset"] = "subset", 
                 standard_width: int = 1920,
@@ -64,3 +65,30 @@ def load_images(mode: Literal["subset", "fullset"] = "subset",
         print("Import, resize en conversie voltooid!")
 
     return imgs_rgb
+
+
+def load_model(mode: Literal["RF_model"]):
+    if mode not in {"RF_model"}:
+        raise ValueError(f"Invalid mode '{mode}'. Expected 'RF_model'.")
+
+    project_root = Path(__file__).resolve().parents[2]
+    config_path = project_root / "config.ini"
+
+    if not config_path.exists():
+        raise FileNotFoundError(f"Configuration file not found: {config_path}")
+
+    config = configparser.ConfigParser()
+    config.read(config_path)
+
+    if not config.has_section("General"):
+        raise configparser.NoSectionError("General")
+
+    if mode.lower() == "rf_model":
+        model_path = (project_root / config.get("General", "RF_Model_path")).resolve()
+
+    if not model_path.exists():
+        raise FileNotFoundError(f"Model file not found: {model_path}")
+    
+    model = joblib.load(model_path)
+
+    return model

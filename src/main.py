@@ -12,6 +12,7 @@ from preprocessing.pipeline import preprocess_image
 from segmentation.colorSegmentation import segment_colors
 from featureExtraction.pipeline import extract_features
 from machineLearning.Random_forest_train import train_random_forest, gridsearch_RF
+from machineLearning.MLprediction import random_forest_predict
 import pandas as pd
 import cv2 as cv
 from sklearn.model_selection import train_test_split
@@ -34,7 +35,7 @@ def apply_machine_learning():
 
     augmented_images = augment_images(
         images, 
-        num_aug_per_image=20,
+        num_aug_per_image=15,
     )
 
     total_images = len(augmented_images)
@@ -142,7 +143,8 @@ def apply_deep_learning(images):
     plt.show()
 
 if __name__ == "__main__":
-    images = load_images("fullset")
+    #images = load_images("fullset")
 
-    apply_deep_learning(images)
+    #apply_deep_learning(images)
     #apply_machine_learning()
+    random_forest_predict()

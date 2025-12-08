@@ -21,13 +21,13 @@ def train_random_forest(df):
         stratify=Y)
 
     ML_model = RandomForestClassifier(
-        n_estimators = 100,
+        n_estimators = 200,
         max_depth = 20,
-        min_samples_split = 2,
+        min_samples_split = 4,
         min_samples_leaf = 1,
         n_jobs = -1,
         random_state = 42,
-        bootstrap = False,
+        bootstrap = True,
         criterion = "entropy",
         class_weight = "balanced",
         ccp_alpha = 0.001,
@@ -37,8 +37,19 @@ def train_random_forest(df):
     ML_model.fit(X_train, Y_train)
 
     y_pred = ML_model.predict(X_test)
-
+    y_proba = ML_model.predict_proba(X_test)
     
+    prob_score = np.max(y_proba, axis=1)
+    y_pred_labels = label_encoder.inverse_transform(y_pred)
+
+    results_df = pd.DataFrame({
+        "True_Label": label_encoder.inverse_transform(Y_test),
+        "Predicted_Label": y_pred_labels,
+        "Prediction_Probability": prob_score
+    })
+
+    print(results_df.head(10))
+
     print("\nClassification report:")
     print(classification_report(Y_test, y_pred, target_names=label_encoder.classes_))
 
@@ -82,15 +93,15 @@ def gridsearch_RF(df):
 )
     
     param_grid = {
-        "n_estimators": [100, 200],
-        "max_depth": [20, 30],
-        "min_samples_split": [2, 3],
-        "min_samples_leaf": [1, 2],
+        "n_estimators": [100,200],
+        "max_depth": [20],
+        "min_samples_split": [2, 3, 4],
+        "min_samples_leaf": [1],
         "max_features": ["sqrt"],
-        "bootstrap": [True, False],
+        "bootstrap": [False],
         "criterion": ["entropy"],
-        "class_weight": ["balanced"],
-        "ccp_alpha": [0.01, 0.001]
+        "class_weight": [None, "balanced"],
+        "ccp_alpha": [0.001, 0.0001]
     }
 
 
