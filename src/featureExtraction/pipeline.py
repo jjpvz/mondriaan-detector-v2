@@ -49,7 +49,7 @@ def extract_features(i, name, class_name, img, red_mask, yellow_mask, blue_mask)
     hist_features = {f"hist_{k}": float(v) for k, v in enumerate(hist_vec)}
 
     features = {
-        "id": "mondriaan " + str(i + 1),
+        "id": i,
         "filename": name,
         "class": class_name,
         "aspect_ratio": aspect_ratio,

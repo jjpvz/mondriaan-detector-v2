@@ -64,23 +64,33 @@ def show_prediction_gui(img, predicted_class, confidence, file_path, continue_ca
     # Maak hoofdvenster
     root = tk.Tk()
     root.title("Mondriaan Detector - Voorspelling")
-    root.geometry("700x680")
     root.configure(bg='#f0f0f0')
     root.resizable(False, False)
     
-    # Centreer venster op scherm
-    root.update_idletasks()
-    width = root.winfo_width()
-    height = root.winfo_height()
-    x = (root.winfo_screenwidth() // 2) - (width // 2)
-    y = (root.winfo_screenheight() // 2) - (height // 2)
-    root.geometry(f'{width}x{height}+{x}+{y}')
+    # Centreer venster op scherm VOOR geometry wordt gezet
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+    window_width = 700
+    window_height = 680
     
-    # Zet venster op de voorgrond
+    x = (screen_width // 2) - (window_width // 2)
+    y = (screen_height // 2) - (window_height // 2) - 100  # Verschuif 100px omhoog
+    
+    # Zorg ervoor dat het venster niet boven de bovenkant van het scherm uitkomt
+    if y < 0:
+        y = 20
+    # Zorg dat het venster niet onder de taakbalk verdwijnt (meestal 40-50px hoog)
+    if y + window_height > screen_height - 60:
+        y = screen_height - window_height - 60
+    
+    root.geometry(f'{window_width}x{window_height}+{x}+{y}')
+    
+    # Zet venster op de voorgrond en houd het daar een moment
     root.lift()
     root.attributes('-topmost', True)
-    root.after_idle(root.attributes, '-topmost', False)
     root.focus_force()
+    # Schakel topmost uit na 200ms zodat het venster niet permanent bovenop blijft
+    root.after(200, lambda: root.attributes('-topmost', False))
     
     # Titel label
     title_label = tk.Label(
@@ -263,8 +273,31 @@ def process_single_prediction(rf_model):
     confidence = np.max(prediction_proba) * 100
     print(f"Voorspelde klasse: {predicted_class} met een vertrouwen van {confidence:.2f}%")
     
+    if (predicted_class == 0):
+        result_class = "mondriaan 1"
+    elif (predicted_class == 1):
+        result_class = "mondriaan 2"
+    elif (predicted_class == 2):
+        result_class = "mondriaan 3"
+    elif (predicted_class == 3):
+        result_class = "mondriaan 4"
+    elif (predicted_class == 4):
+        result_class = "mondriaan 5"
+    elif (predicted_class == 5):
+        result_class = "mondriaan 6"
+    elif (predicted_class == 6):
+        result_class = "mondriaan 7"
+    elif (predicted_class == 7):
+        result_class = "mondriaan 8"
+    elif (predicted_class == 8):
+        result_class = "mondriaan 9"
+    elif (predicted_class == 9):
+        result_class = "mondriaan 10"
+    else:
+        result_class = "Ander beeld"
+
     # Toon resultaat in GUI met callback voor nieuwe voorspelling
-    show_prediction_gui(img, predicted_class, confidence, file_path, 
+    show_prediction_gui(img, result_class, confidence, file_path, 
                        lambda: process_single_prediction(rf_model))
     
     return True

@@ -35,7 +35,7 @@ def apply_machine_learning():
 
     augmented_images = augment_images(
         images, 
-        num_aug_per_image=15,
+        num_aug_per_image=20,
     )
 
     total_images = len(augmented_images)

@@ -21,9 +21,9 @@ def train_random_forest(df):
         stratify=Y)
 
     ML_model = RandomForestClassifier(
-        n_estimators = 200,
-        max_depth = 20,
-        min_samples_split = 4,
+        n_estimators = 1000,
+        max_depth = None,
+        min_samples_split = 3,
         min_samples_leaf = 1,
         n_jobs = -1,
         random_state = 42,
@@ -93,15 +93,15 @@ def gridsearch_RF(df):
 )
     
     param_grid = {
-        "n_estimators": [100,200],
-        "max_depth": [20],
-        "min_samples_split": [2, 3, 4],
+        "n_estimators": [1],
+        "max_depth": [None],
+        "min_samples_split": [ 3,4,5],
         "min_samples_leaf": [1],
         "max_features": ["sqrt"],
-        "bootstrap": [False],
+        "bootstrap": [True],
         "criterion": ["entropy"],
-        "class_weight": [None, "balanced"],
-        "ccp_alpha": [0.001, 0.0001]
+        "class_weight":["balanced"],
+        "ccp_alpha": [0.001]
     }
 
 
