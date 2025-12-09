@@ -13,6 +13,7 @@ from segmentation.colorSegmentation import segment_colors
 from featureExtraction.pipeline import extract_features
 from machineLearning.Random_forest_train import train_random_forest, gridsearch_RF
 from machineLearning.MLprediction import random_forest_predict
+from machineLearning.lightGBM import train_lightgbm, gridsearch_LGBM
 import pandas as pd
 import cv2 as cv
 from sklearn.model_selection import train_test_split
@@ -32,6 +33,8 @@ def apply_machine_learning():
     orb_features_list = []
 
     hist_features_list = []
+
+    
 
     augmented_images = augment_images(
         images, 
@@ -64,11 +67,13 @@ def apply_machine_learning():
     
     dataframe = pd.DataFrame(features_list)
     print(dataframe)
-    
-    model_rm = train_random_forest(dataframe)
-    #dataframe.to_csv("data.csv", index=False)
 
-    joblib.dump(model_rm, "random_forest_model.joblib")
+    dataframe.to_csv("feature_dataframe.csv", index=False)
+    
+    model_rm = gridsearch_LGBM(dataframe)
+    
+
+    #joblib.dump(model_rm, "random_forest_model.joblib")
 
     # analyze_features(dataframe, hog_features_list, dct_features_list, orb_features_list, hist_features_list)
 
@@ -143,8 +148,8 @@ def apply_deep_learning(images):
     plt.show()
 
 if __name__ == "__main__":
-    #images = load_images("fullset")
+    images = load_images("fullset")
 
-    #apply_deep_learning(images)
+    apply_deep_learning(images)
     #apply_machine_learning()
-    random_forest_predict()
+    #random_forest_predict()

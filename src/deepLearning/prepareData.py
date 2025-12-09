@@ -13,7 +13,7 @@ def prepare_data_for_dl(images):
     for image_raw, _, class_name in images:
         image_processed = preprocess_image(image_raw, False)
 
-        resized_img = cv.resize(image_processed, (244, 244), interpolation=cv.INTER_AREA)
+        resized_img = cv.resize(image_processed, (224, 224), interpolation=cv.INTER_AREA)
 
         image_normalized = resized_img.astype('float32') / 255.0
         

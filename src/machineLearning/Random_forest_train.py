@@ -22,7 +22,7 @@ def train_random_forest(df):
 
     ML_model = RandomForestClassifier(
         n_estimators = 1000,
-        max_depth = None,
+        max_depth = 20,
         min_samples_split = 3,
         min_samples_leaf = 1,
         n_jobs = -1,
@@ -66,7 +66,7 @@ def train_random_forest(df):
     print(f"Mean CV accuracy: {np.mean(cv_scores):.4f} (+/- {np.std(cv_scores) * 2:.4f})")
 
     # Learning curve - reduced splits and sequential processing to avoid memory issues
-    cv = ShuffleSplit(n_splits=10, test_size=0.2, random_state=42)  # Reduced from 100 to 10
+    cv = ShuffleSplit(n_splits=5, test_size=0.2, random_state=42)  # Reduced from 100 to 10
     learning_curve_plt = plot_learning_curve(ML_model, X_train, Y_train, cv=cv, n_jobs=-1)  
     learning_curve_plt.show()
 
@@ -93,15 +93,15 @@ def gridsearch_RF(df):
 )
     
     param_grid = {
-        "n_estimators": [1],
-        "max_depth": [None],
-        "min_samples_split": [ 3,4,5],
-        "min_samples_leaf": [1],
-        "max_features": ["sqrt"],
-        "bootstrap": [True],
-        "criterion": ["entropy"],
-        "class_weight":["balanced"],
-        "ccp_alpha": [0.001]
+        "n_estimators": [100,200,500,1000],
+        "max_depth": [10,20,None],
+        "min_samples_split": [2,3,4,5],
+        "min_samples_leaf": [1,2,3,4],
+        "max_features": ["sqrt", "log2"],
+        "bootstrap": [True, False],
+        "criterion": ["entropy", "gini"],
+        "class_weight":["balanced", None],
+        "ccp_alpha": [0.1, 0.001, 0.0001]
     }
 
 
