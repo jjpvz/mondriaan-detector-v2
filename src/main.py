@@ -148,8 +148,8 @@ def apply_deep_learning(images):
     plt.show()
 
 if __name__ == "__main__":
-    images = load_images("fullset")
+  #  images = load_images("fullset")
 
-    apply_deep_learning(images)
+  #  apply_deep_learning(images)
     #apply_machine_learning()
     #random_forest_predict()

@@ -26,14 +26,14 @@ def preprocess_image(img_rgb, visualize: bool = False):
 
     no_borders = remove_horizontal_borders(canny[0], perc=0.02)
 
-    morph = morph_close(no_borders, kernel_size=3, iterations=3)
+    morph = morph_close(no_borders, kernel_size=3, iterations=5)
 
     if visualize:
         display_image(morph)
 
     contour = getLargestContour(morph)
     
-    cropped_img = extract_roi(img_rgb, contour)
+    cropped_img = extract_rotated_roi(img_rgb, contour)
 
     if visualize:
         display_image(cropped_img)
