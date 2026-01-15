@@ -23,7 +23,7 @@ def train_random_forest(df):
 
     ML_model = RandomForestClassifier(
         n_estimators = 618,
-        max_depth = 10,
+        max_depth = 15,
         min_samples_split = 4,
         min_samples_leaf = 8,
         n_jobs = -1,
@@ -43,7 +43,7 @@ def train_random_forest(df):
     
     prob_score = np.max(y_proba, axis=1)
     y_pred_labels = label_encoder.inverse_transform(y_pred)
-    '''
+    
     results_df = pd.DataFrame({
         "True_Label": label_encoder.inverse_transform(Y_test),
         "Predicted_Label": y_pred_labels,
@@ -62,21 +62,19 @@ def train_random_forest(df):
     plt.show()
 
     # perform cross-validation to evaluate model stability
-    cv_scores = cross_val_score(ML_model, X_train, Y_train, cv=3, n_jobs=-1, scoring="accuracy")
+  #  cv_scores = cross_val_score(ML_model, X_train, Y_train, cv=3, n_jobs=-1, scoring="accuracy")
 
-    print(f"Cross-validation scores: {cv_scores}")
-    print(f"Mean CV accuracy: {np.mean(cv_scores):.4f} (+/- {np.std(cv_scores) * 2:.4f})")
+ #   print(f"Cross-validation scores: {cv_scores}")
+  #  print(f"Mean CV accuracy: {np.mean(cv_scores):.4f} (+/- {np.std(cv_scores) * 2:.4f})")
 
     # Learning curve - reduced splits and sequential processing to avoid memory issues
-    cv = ShuffleSplit(n_splits=10, test_size=0.2, random_state=42)  # Reduced from 100 to 10
+    cv = ShuffleSplit(n_splits=5, test_size=0.2, random_state=42)  # Reduced from 100 to 10
     learning_curve_plt = plot_learning_curve(ML_model, X_train, Y_train, cv=cv, n_jobs=-1)  
     learning_curve_plt.show()
-    '''
+    
     return ML_model
 
-
 '''
-
 def gridsearch_RF(df):
     le = LabelEncoder()
     y = le.fit_transform(df["class"])

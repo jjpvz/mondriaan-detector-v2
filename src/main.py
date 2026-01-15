@@ -40,7 +40,7 @@ def apply_machine_learning():
 
     augmented_images = augment_images(
         images, 
-        num_aug_per_image=15,
+        num_aug_per_image=10,
     )
 
     total_images = len(augmented_images)
@@ -154,11 +154,11 @@ def apply_deep_learning(images):
     plt.show()
 
 if __name__ == "__main__":
-   # images = load_images("fullset")
+  #  images = load_images("fullset")
 
     #apply_deep_learning(images)
-   # apply_machine_learning()
+    apply_machine_learning()
     #random_forest_predict()
 
-    test_random_forest_with_gui()
+    #test_random_forest_with_gui()
 
