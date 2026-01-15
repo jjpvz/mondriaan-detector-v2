@@ -1,8 +1,9 @@
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import cross_val_score, train_test_split, ShuffleSplit, GridSearchCV, RandomizedSearchCV
+from sklearn.model_selection import cross_val_score, train_test_split, ShuffleSplit, GridSearchCV, RandomizedSearchCV, StratifiedKFold
 from sklearn.metrics import ConfusionMatrixDisplay, classification_report, confusion_matrix, accuracy_score
 from sklearn.preprocessing import LabelEncoder
 from helpers.learningcurve import plot_learning_curve
+from scipy.stats import randint, uniform
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -21,17 +22,18 @@ def train_random_forest(df):
         stratify=Y)
 
     ML_model = RandomForestClassifier(
-        n_estimators = 1000,
-        max_depth = 20,
-        min_samples_split = 3,
-        min_samples_leaf = 1,
+        n_estimators = 618,
+        max_depth = 10,
+        min_samples_split = 4,
+        min_samples_leaf = 8,
         n_jobs = -1,
         random_state = 42,
         bootstrap = True,
         criterion = "entropy",
         class_weight = "balanced",
-        ccp_alpha = 0.001,
-        max_features="sqrt"
+        ccp_alpha = 0.002,
+        max_features= 0.5,
+        max_samples= None
     )
 
     ML_model.fit(X_train, Y_train)
@@ -41,7 +43,7 @@ def train_random_forest(df):
     
     prob_score = np.max(y_proba, axis=1)
     y_pred_labels = label_encoder.inverse_transform(y_pred)
-
+    '''
     results_df = pd.DataFrame({
         "True_Label": label_encoder.inverse_transform(Y_test),
         "Predicted_Label": y_pred_labels,
@@ -60,18 +62,76 @@ def train_random_forest(df):
     plt.show()
 
     # perform cross-validation to evaluate model stability
-    cv_scores = cross_val_score(ML_model, X_train, Y_train, cv=5, scoring="accuracy")
+    cv_scores = cross_val_score(ML_model, X_train, Y_train, cv=3, n_jobs=-1, scoring="accuracy")
 
     print(f"Cross-validation scores: {cv_scores}")
     print(f"Mean CV accuracy: {np.mean(cv_scores):.4f} (+/- {np.std(cv_scores) * 2:.4f})")
 
     # Learning curve - reduced splits and sequential processing to avoid memory issues
-    cv = ShuffleSplit(n_splits=5, test_size=0.2, random_state=42)  # Reduced from 100 to 10
+    cv = ShuffleSplit(n_splits=10, test_size=0.2, random_state=42)  # Reduced from 100 to 10
     learning_curve_plt = plot_learning_curve(ML_model, X_train, Y_train, cv=cv, n_jobs=-1)  
     learning_curve_plt.show()
-
+    '''
     return ML_model
 
+
+'''
+
+def gridsearch_RF(df):
+    le = LabelEncoder()
+    y = le.fit_transform(df["class"])
+
+    X = df.drop(columns=["id", "filename", "class"], errors="ignore")
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42, stratify=y
+    )
+
+    rf = RandomForestClassifier(n_jobs=1, random_state=42)
+
+    param_distributions = {
+        "n_estimators": [618,700],
+        "max_depth": [10],
+        "min_samples_split": [4,6],
+        "min_samples_leaf": [8],
+        "max_features": [0.5],
+        "criterion": ["gini", "entropy"],
+        "class_weight": ["balanced"],
+        "ccp_alpha": [0.002, 0.003],
+        "max_samples": [None],
+    }
+
+    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+
+    search = RandomizedSearchCV(
+        rf,
+        param_distributions=param_distributions,
+        n_iter=60,
+        cv=cv,
+        scoring="f1_macro",
+        n_jobs=-1,
+        verbose=2,
+        random_state=42
+    )
+
+    search.fit(X_train, y_train)
+
+    best_model = search.best_estimator_
+    print("Best params:", search.best_params_)
+    print("Best CV score (f1_macro):", search.best_score_)
+
+    y_train_pred = best_model.predict(X_train)
+    y_test_pred = best_model.predict(X_test)
+
+    print("Train accuracy:", accuracy_score(y_train, y_train_pred))
+    print("Test accuracy:", accuracy_score(y_test, y_test_pred))
+    print(classification_report(y_test, y_test_pred))
+    print(confusion_matrix(y_test, y_test_pred))
+
+    return None
+
+
+'''
 
 def gridsearch_RF(df):
 
@@ -93,15 +153,15 @@ def gridsearch_RF(df):
 )
     
     param_grid = {
-        "n_estimators": [100,200,500,1000],
-        "max_depth": [10,20,None],
-        "min_samples_split": [2,3,4,5],
-        "min_samples_leaf": [1,2,3,4],
-        "max_features": ["sqrt", "log2"],
-        "bootstrap": [True, False],
-        "criterion": ["entropy", "gini"],
-        "class_weight":["balanced", None],
-        "ccp_alpha": [0.1, 0.001, 0.0001]
+        "n_estimators": [618,700],
+        "max_depth": [10],
+        "min_samples_split": [4,6],
+        "min_samples_leaf": [8],
+        "max_features": [0.5],
+        "criterion": ["gini", "entropy"],
+        "class_weight": ["balanced"],
+        "ccp_alpha": [0.002, 0.003],
+        "max_samples": [None],
     }
 
 

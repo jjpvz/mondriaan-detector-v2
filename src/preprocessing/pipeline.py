@@ -33,7 +33,7 @@ def preprocess_image(img_rgb, visualize: bool = False):
 
     contour = getLargestContour(morph)
     
-    cropped_img = extract_roi(img_rgb, contour)
+    cropped_img = extract_rotated_roi(img_rgb, contour)
 
     if visualize:
         display_image(cropped_img)

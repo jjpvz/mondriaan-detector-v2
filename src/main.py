@@ -8,6 +8,7 @@ from featureExtraction.dct import compute_dct_features
 from featureExtraction.hog import compute_hog_features
 from featureExtraction.orb import compute_orb_features
 from helpers.display import display_image
+from helpers.test_model import test_random_forest_with_gui
 from preprocessing.pipeline import preprocess_image
 from segmentation.colorSegmentation import segment_colors
 from featureExtraction.pipeline import extract_features
@@ -27,6 +28,7 @@ from sklearn.metrics import confusion_matrix
 from deepLearning.transferEfficientNetB0  import create_transfer_model_efficientnet
 
 def apply_machine_learning():
+    '''
     features_list = [] 
     hog_features_list = []
     dct_features_list = []
@@ -38,7 +40,7 @@ def apply_machine_learning():
 
     augmented_images = augment_images(
         images, 
-        num_aug_per_image=20,
+        num_aug_per_image=15,
     )
 
     total_images = len(augmented_images)
@@ -60,7 +62,7 @@ def apply_machine_learning():
         # hist_features_list.append(compute_block_histogram(image))
         #dct_features_list.append(compute_dct_features(image, 8, True))
         # hog_features_list.append(compute_hog_features(image, False))
-        # orb_features_list.append(compute_orb_features(image, False))
+        # orb_features_list.append(compute_orb_features(image, False))                                         
 
     print()  # New line after progress
     print("Feature extraction voltooid!\n")
@@ -69,11 +71,15 @@ def apply_machine_learning():
     print(dataframe)
 
     dataframe.to_csv("feature_dataframe.csv", index=False)
-    
-    model_rm = gridsearch_LGBM(dataframe)
+
+    '''
+
+    dataframe = pd.read_csv("feature_dataframe.csv")
+    #gridsearch_RF(dataframe)
+    model_rm = train_random_forest(dataframe)
     
 
-    #joblib.dump(model_rm, "random_forest_model.joblib")
+    joblib.dump(model_rm, "random_forest_model.joblib")
 
     # analyze_features(dataframe, hog_features_list, dct_features_list, orb_features_list, hist_features_list)
 
@@ -148,8 +154,11 @@ def apply_deep_learning(images):
     plt.show()
 
 if __name__ == "__main__":
-    images = load_images("fullset")
+   # images = load_images("fullset")
 
-    apply_deep_learning(images)
-    #apply_machine_learning()
+    #apply_deep_learning(images)
+   # apply_machine_learning()
     #random_forest_predict()
+
+    test_random_forest_with_gui()
+

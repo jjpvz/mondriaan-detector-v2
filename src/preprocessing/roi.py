@@ -24,6 +24,36 @@ def extract_roi(img, contour):
     cropped_img = img[y_min:y_max, x_min:x_max]
     return cropped_img
 
+def extract_rotated_roi(img, contour):
+    """
+    Extract ROI using rotated bounding box - works for diamonds/squares at any angle.
+    Returns the cropped and straightened image.
+    """
+    # Get the minimum area rectangle (rotated bounding box)
+    rect = cv.minAreaRect(contour)
+    box = cv.boxPoints(rect)
+    box = np.int0(box)
+    
+    # Get center, size and angle of the rectangle
+    center, size, angle = rect
+    width, height = int(size[0]), int(size[1])
+    
+    # Make sure width > height (rotate if needed)
+    if width < height:
+        angle += 90
+        width, height = height, width
+    
+    # Get rotation matrix
+    M = cv.getRotationMatrix2D(center, angle, 1.0)
+    
+    # Rotate the entire image
+    img_rotated = cv.warpAffine(img, M, (img.shape[1], img.shape[0]), flags=cv.INTER_CUBIC)
+    
+    # Crop the rotated rectangle
+    cropped = cv.getRectSubPix(img_rotated, (width, height), center)
+    
+    return cropped
+
 def auto_canny(img, sigma=0.33):
     # compute the median of the single channel pixel intensities
     # Check if image is already grayscale (1 channel) or needs conversion
