@@ -85,5 +85,6 @@ def test_random_forest_with_gui() -> None:
 
 		predicted_class, confidence = _predict_single(rf_model, img)
 		confidence = min(confidence + 0.20, 1.0)
+		print(f"Voorspelling: {predicted_class} (index: {predicted_class}) - Zekerheid: {confidence * 100:.2f}%")
 		show_prediction_window(img, predicted_class, confidence)
 

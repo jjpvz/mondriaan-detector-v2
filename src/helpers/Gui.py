@@ -248,9 +248,9 @@ def show_directory_selection_window():
     
     def on_directory_selected():
         # Open directory dialog
-        # determine project root: one level above this src file
+        # determine project root: two levels above this helpers file
         try:
-            project_root = Path(__file__).resolve().parent.parent
+            project_root = Path(__file__).resolve().parent.parent.parent
         except Exception:
             project_root = None
 
