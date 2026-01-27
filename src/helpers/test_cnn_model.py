@@ -9,6 +9,7 @@ from tkinter import filedialog
 from tensorflow import keras
 
 from helpers.Gui import show_directory_selection_window, show_prediction_window
+from helpers.display import display_image
 from preprocessing.pipeline import preprocess_image
 
 
@@ -43,10 +44,10 @@ def _iter_image_files(directory: Path) -> list[Path]:
 
 
 def _prepare_cnn_input(img_bgr: np.ndarray) -> np.ndarray:
-    pre_img = preprocess_image(img_bgr, False)
-    resized = cv.resize(pre_img, IMAGE_SIZE, interpolation=cv.INTER_AREA)
-    normalized = resized.astype("float32") / 255.0
-    return np.expand_dims(normalized, axis=0)
+    resized = cv.resize(img_bgr, IMAGE_SIZE, interpolation=cv.INTER_AREA)
+    img_rgb = cv.cvtColor(resized, cv.COLOR_BGR2RGB)
+    ready_img = img_rgb.astype("float32")
+    return np.expand_dims(ready_img, axis=0)
 
 
 def _predict_single(model, img_bgr: np.ndarray) -> tuple[int, float]:
@@ -89,4 +90,4 @@ def test_cnn_model_with_gui(class_names: list[str] | None = None, model_path: st
         predicted_label = class_names[predicted_idx] if class_names else predicted_idx
         print(f"Voorspelling: {predicted_label} (index: {predicted_idx}) - Zekerheid: {confidence * 100:.2f}%")
 
-        show_prediction_window(img, predicted_label, confidence,csv_path=r"C:\\GIT\\mondriaan-detector-v2\\texts_cnn.csv")
+        show_prediction_window(img, predicted_label, confidence)

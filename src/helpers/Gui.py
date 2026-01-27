@@ -13,7 +13,7 @@ import re
 from functools import lru_cache
 
 
-CSV_PATH = "C:\\GIT\\mondriaan-detector-v2\\texts.csv"  # <-- pas aan indien nodig
+CSV_PATH = "C:\\workspace\\evml\\EVML Project\\mondriaan-detection-project\\texts.csv"
 
 
 def _prediction_to_csv_label(prediction):
