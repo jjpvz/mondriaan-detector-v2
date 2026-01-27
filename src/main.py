@@ -163,5 +163,5 @@ if __name__ == "__main__":
 
     
     test_random_forest_with_gui()
-    #test_cnn_model_with_gui()
+    test_cnn_model_with_gui()
 
