@@ -23,16 +23,16 @@ def train_random_forest(df):
 
     ML_model = RandomForestClassifier(
         n_estimators = 618,
-        max_depth = 15,
-        min_samples_split = 4,
-        min_samples_leaf = 8,
+        max_depth = None,
+        min_samples_split = 2,
+        min_samples_leaf = 2,
         n_jobs = -1,
         random_state = 42,
         bootstrap = True,
         criterion = "entropy",
         class_weight = "balanced",
-        ccp_alpha = 0.002,
-        max_features= 0.5,
+        ccp_alpha = 0.001,
+        max_features= "sqrt",
         max_samples= None
     )
 
@@ -67,9 +67,14 @@ def train_random_forest(df):
  #   print(f"Cross-validation scores: {cv_scores}")
   #  print(f"Mean CV accuracy: {np.mean(cv_scores):.4f} (+/- {np.std(cv_scores) * 2:.4f})")
 
-    # Learning curve - reduced splits and sequential processing to avoid memory issues
-    cv = ShuffleSplit(n_splits=5, test_size=0.2, random_state=42)  # Reduced from 100 to 10
-    learning_curve_plt = plot_learning_curve(ML_model, X_train, Y_train, cv=cv, n_jobs=-1)  
+    # Learning curve - optimized for speed
+    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)  # StratifiedKFold is faster than ShuffleSplit
+    learning_curve_plt = plot_learning_curve(
+        ML_model, X_train, Y_train, 
+        cv=cv, 
+        n_jobs=-1,
+        train_sizes=np.linspace(0.1, 1.0, 10)  # Only 5 training sizes instead of default 10
+    )  
     learning_curve_plt.show()
     
     return ML_model
@@ -151,14 +156,14 @@ def gridsearch_RF(df):
 )
     
     param_grid = {
-        "n_estimators": [618,700],
-        "max_depth": [10],
-        "min_samples_split": [4,6],
-        "min_samples_leaf": [8],
-        "max_features": [0.5],
+        "n_estimators": [618],
+        "max_depth": [10,None],
+        "min_samples_split": [1,2,4,6],
+        "min_samples_leaf": [1,2,5,8],
+        "max_features": ["sqrt",0.5],
         "criterion": ["gini", "entropy"],
         "class_weight": ["balanced"],
-        "ccp_alpha": [0.002, 0.003],
+        "ccp_alpha": [0.001, 0.002],
         "max_samples": [None],
     }
 

@@ -89,4 +89,4 @@ def test_cnn_model_with_gui(class_names: list[str] | None = None, model_path: st
         predicted_label = class_names[predicted_idx] if class_names else predicted_idx
         print(f"Voorspelling: {predicted_label} (index: {predicted_idx}) - Zekerheid: {confidence * 100:.2f}%")
 
-        show_prediction_window(img, predicted_label, confidence)
+        show_prediction_window(img, predicted_label, confidence,csv_path=r"C:\\GIT\\mondriaan-detector-v2\\texts_cnn.csv")
