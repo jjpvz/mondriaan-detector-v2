@@ -22,7 +22,7 @@ from sklearn.model_selection import train_test_split
 import tensorflow as tf
 import numpy as np
 import joblib
-#from deepLearning.transferMobileNetV2 import create_transfer_model
+from deepLearning.transferMobileNetV2 import create_transfer_model
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix
@@ -94,9 +94,9 @@ def apply_deep_learning(images):
     print(f"Totale dataset vorm (X): {X.shape}") 
     print(f"Aantal klassen: {num_classes}")
 
-    # model = create_cnn_model(input_shape, num_classes)
-    # model = create_transfer_model(num_classes, input_shape=input_shape) # MobileNetV2
-    model = create_transfer_model_efficientnet(num_classes, input_shape=input_shape) #EfficientNetB0
+    model = create_cnn_model(input_shape, num_classes)
+    model = create_transfer_model(num_classes, input_shape=input_shape) # MobileNetV2
+    # model = create_transfer_model_efficientnet(num_classes, input_shape=input_shape) #EfficientNetB0
 
     model.compile(optimizer='adam',
                 loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False), # Gebruik SC_Crossentropy voor integer labels
@@ -157,11 +157,11 @@ def apply_deep_learning(images):
 if __name__ == "__main__":
   #  images = load_images("fullset")
 
-    #apply_deep_learning(images)
+    # apply_deep_learning(images)
    # apply_machine_learning()
     #random_forest_predict()
 
     
-    test_random_forest_with_gui()
-    test_cnn_model_with_gui()
+    # test_random_forest_with_gui()
+    test_cnn_model_with_gui(model_path="C:\\workspace\\evml\\EVD3\\mondriaan-detector-dl\\models\\mondriaan_detector_DL.keras")
 
