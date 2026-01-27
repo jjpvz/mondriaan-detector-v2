@@ -32,7 +32,7 @@ def extract_rotated_roi(img, contour):
     # Get the minimum area rectangle (rotated bounding box)
     rect = cv.minAreaRect(contour)
     box = cv.boxPoints(rect)
-    box = np.int0(box)
+    box = box.astype(np.int32)
     
     # Get center, size and angle of the rectangle
     center, size, angle = rect
