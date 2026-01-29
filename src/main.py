@@ -27,6 +27,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix
 from deepLearning.transferEfficientNetB0  import create_transfer_model_efficientnet
+import configparser
+import os
+
+# Load config
+config = configparser.ConfigParser()
+config_path = os.path.join(os.path.dirname(__file__), "..", "config.ini")
+config.read(config_path)
 
 def apply_machine_learning():
     '''
@@ -48,7 +55,7 @@ def apply_machine_learning():
     print(f"\nFeature extraction gestart voor {total_images} afbeeldingen...")
       
     for i, (image, name, class_name) in enumerate(augmented_images):
-
+ 
         image = preprocess_image(image, False)
         
         red_mask, yellow_mask, blue_mask = segment_colors(image, False)
@@ -71,11 +78,11 @@ def apply_machine_learning():
     dataframe = pd.DataFrame(features_list)
     print(dataframe)
 
-    dataframe.to_csv("feature_dataframe.csv", index=False)
+    dataframe.to_csv(config['General']['csv_path'], index=False)
 
     '''
 
-    dataframe = pd.read_csv("feature_dataframe.csv")
+    dataframe = pd.read_csv(config['General']['csv_path'])
     #gridsearch_RF(dataframe)
     model_rm = train_random_forest(dataframe)
     
@@ -154,14 +161,16 @@ def apply_deep_learning(images):
     plt.tight_layout()
     plt.show()
 
-if __name__ == "__main__":
-  #  images = load_images("fullset")
+    model.save("mobilenetv2_mondriaan_model.keras")
 
-    # apply_deep_learning(images)
-   # apply_machine_learning()
-    #random_forest_predict()
+if __name__ == "__main__":
+    images = load_images("fullset")
+
+    apply_deep_learning(images)
+    # apply_machine_learning()
+    # random_forest_predict()
 
     
     # test_random_forest_with_gui()
-    test_cnn_model_with_gui(model_path="C:\\workspace\\evml\\EVD3\\mondriaan-detector-dl\\models\\mondriaan_detector_DL.keras")
+    # test_cnn_model_with_gui()
 

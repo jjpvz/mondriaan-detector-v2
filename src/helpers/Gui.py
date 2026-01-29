@@ -11,9 +11,14 @@ import csv
 import json
 import re
 from functools import lru_cache
+import configparser
 
+# Load config
+config = configparser.ConfigParser()
+config_path = os.path.join(os.path.dirname(__file__), "..", "..", "config.ini")
+config.read(config_path)
 
-CSV_PATH = "C:\\workspace\\evml\\EVML Project\\mondriaan-detection-project\\texts.csv"
+CSV_PATH = config['General']['texts_csv_path']
 
 
 def _prediction_to_csv_label(prediction):
