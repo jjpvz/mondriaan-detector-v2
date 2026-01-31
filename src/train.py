@@ -1,8 +1,16 @@
 import argparse
+import keras
 import pandas as pd
 import joblib
 import configparser
-import os
+
+from deep_learning.analyze.print_specification_report import print_specification_report
+from deep_learning.augment_images import augment_images as augment_images_for_dl
+from deep_learning.analyze.plot_confusion_matrix import plot_confusion_matrix
+from deep_learning.analyze.plot_learning_curves import plot_learning_curves
+from deep_learning.analyze.get_predictions import get_predictions
+from deep_learning.train_model import train_model
+from deep_learning.get_model import get_optimal_model
 
 from machine_learning.data_acquisition.data_augmentation import augment_images
 from machine_learning.data_acquisition.load import load_images
@@ -10,10 +18,6 @@ from machine_learning.feature_extraction.pipeline import extract_features
 from machine_learning.preprocessing.pipeline import preprocess_image
 from machine_learning.segmentation.colorSegmentation import segment_colors
 from machine_learning.train_model import gridsearch_RF, train_random_forest
-
-config = configparser.ConfigParser()
-config_path = os.path.join(os.path.dirname(__file__), "..", "config.ini")
-config.read(config_path)
 
 def train_ml_model():
     images = load_images("fullset")
@@ -50,72 +54,41 @@ def train_ml_model():
     joblib.dump(model_rm, config['General']['RF_Model_path'])
 
 def train_dl_model():
-    print("not supported")
-    # X, y, class_names = prepare_data_for_dl(images)
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    fullset = config['General']['fullset_path']
+    model_path = config['General']['dl_path']
 
-    # input_shape = X.shape[1:] 
-    # num_classes = len(class_names)
+    image_size = (224, 224)
+    batch_size = 32
 
-    # model = create_cnn_model(input_shape, num_classes)
-    # model = create_transfer_model(num_classes, input_shape=input_shape)
+    train_ds, val_ds = keras.utils.image_dataset_from_directory(
+        fr"{fullset}",
+        validation_split=0.2,
+        subset="both",
+        seed=1337,
+        image_size=image_size,
+        batch_size=batch_size,
+    )
 
-    # model.compile(optimizer='adam',
-    #             loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
-    #             metrics=['accuracy'])
+    augmentation = augment_images_for_dl()
 
-    # model.summary()
+    input_shape = image_size + (3,)
+    num_classes = len(train_ds.class_names)
 
-    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+    model = get_optimal_model(input_shape, num_classes, augmentation)
 
-    # history = model.fit(
-    #     X_train, 
-    #     y_train, 
-    #     epochs=20,         
-    #     validation_split=0.1,
-    #     shuffle=True)
-    #     # --- Learning curve ---
-    # plt.figure(figsize=(10, 5))
-    # plt.plot(history.history['loss'], label='Training loss')
-    # plt.plot(history.history['val_loss'], label='Validation loss')
-    # plt.plot(history.history['accuracy'], label='Training accuracy')
-    # plt.plot(history.history['val_accuracy'], label='Validation accuracy')
-    # plt.xlabel("Epoch")
-    # plt.ylabel("Loss / Accuracy")
-    # plt.legend()
-    # plt.grid(True)
-    # plt.tight_layout()
-    # plt.show()
+    history = train_model(model, train_ds, val_ds)
+    model.save(model_path)
 
+    y_val, y_pred = get_predictions(model, val_ds)
 
-    # test_loss, test_acc = model.evaluate(X_test, y_test, verbose=2)
-    # print(f'\nTest Nauwkeurigheid: {test_acc:.4f}')
+    print_specification_report(y_val, y_pred, train_ds)
+    plot_learning_curves(history)
+    plot_confusion_matrix(y_val, y_pred, train_ds)
 
-    # predictions = model.predict(X_test)   
-    # most_probable_predictions = np.argmax(predictions, axis=1)
-
-    # print("\nVoorbeeld van voorspellingen op de testset:")
-    # for i in range(5):
-    #     print(f"Werkelijke label: {class_names[y_test[i]]} (Index: {y_test[i]})")
-    #     print(f"Voorspeld label: {class_names[most_probable_predictions[i]]} (Index: {most_probable_predictions[i]})\n")
-    
-    # # --- Confusion matrix ---
-    # cm = confusion_matrix(y_test, most_probable_predictions, normalize='true')
-
-    # plt.figure(figsize=(8, 6))
-    # sns.heatmap(
-    #     cm,
-    #     annot=True,
-    #     cmap="Blues",
-    #     xticklabels=class_names,
-    #     yticklabels=class_names
-    # )
-    # plt.xlabel("Predicted")
-    # plt.ylabel("True")
-    # plt.title("Normalized Confusion Matrix (testset)")
-    # plt.tight_layout()
-    # plt.show()
-
-    # model.save("mobilenetv2_mondriaan_model.keras")
+def train_tl_model():
+    print("not implemented yet")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train ML en DL modellen.")
@@ -130,5 +103,8 @@ if __name__ == "__main__":
     if args.model == 'ml':
         train_ml_model()
 
-    if args.model == 'dl' or args.model == 'ts':
+    if args.model == 'dl':
         train_dl_model()
+
+    if args.model == 'tl':
+        train_tl_model()
