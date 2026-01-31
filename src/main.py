@@ -4,9 +4,6 @@ from dataAcquisition.load import load_images
 from deepLearning.createModel import create_cnn_model
 from deepLearning.prepareData import prepare_data_for_dl
 from featureExtraction.blockHistogram import compute_block_histogram
-from featureExtraction.dct import compute_dct_features
-from featureExtraction.hog import compute_hog_features
-from featureExtraction.orb import compute_orb_features
 from helpers.display import display_image
 from helpers.test_cnn_model import test_cnn_model_with_gui
 from helpers.test_model import test_random_forest_with_gui
@@ -30,21 +27,12 @@ from deepLearning.transferEfficientNetB0  import create_transfer_model_efficient
 import configparser
 import os
 
-# Load config
 config = configparser.ConfigParser()
 config_path = os.path.join(os.path.dirname(__file__), "..", "config.ini")
 config.read(config_path)
 
-def apply_machine_learning():
-    '''
+def apply_machine_learning(images):
     features_list = [] 
-    hog_features_list = []
-    dct_features_list = []
-    orb_features_list = []
-
-    hist_features_list = []
-
-    
 
     augmented_images = augment_images(
         images, 
@@ -55,58 +43,37 @@ def apply_machine_learning():
     print(f"\nFeature extraction gestart voor {total_images} afbeeldingen...")
       
     for i, (image, name, class_name) in enumerate(augmented_images):
- 
         image = preprocess_image(image, False)
-        
         red_mask, yellow_mask, blue_mask = segment_colors(image, False)
-
         features_list.append(extract_features(i, name, class_name, image, red_mask, yellow_mask, blue_mask))
         
-        # Show progress
         if total_images > 0:
             progress = ((i + 1) / total_images) * 100
             print(f"\rFeatures extraheren: {progress:.1f}% ({i + 1}/{total_images})", end="", flush=True)
         
-        # hist_features_list.append(compute_block_histogram(image))
-        #dct_features_list.append(compute_dct_features(image, 8, True))
-        # hog_features_list.append(compute_hog_features(image, False))
-        # orb_features_list.append(compute_orb_features(image, False))                                         
-
-    print()  # New line after progress
-    print("Feature extraction voltooid!\n")
-    
     dataframe = pd.DataFrame(features_list)
-    print(dataframe)
 
     dataframe.to_csv(config['General']['csv_path'], index=False)
 
-    '''
-
     dataframe = pd.read_csv(config['General']['csv_path'])
-    #gridsearch_RF(dataframe)
+
+    gridsearch_RF(dataframe)
+
     model_rm = train_random_forest(dataframe)
-    
 
     joblib.dump(model_rm, "random_forest_model.joblib")
 
-    # analyze_features(dataframe, hog_features_list, dct_features_list, orb_features_list, hist_features_list)
-
 def apply_deep_learning(images):
-
     X, y, class_names = prepare_data_for_dl(images)
 
     input_shape = X.shape[1:] 
     num_classes = len(class_names)
 
-    print(f"Totale dataset vorm (X): {X.shape}") 
-    print(f"Aantal klassen: {num_classes}")
-
     model = create_cnn_model(input_shape, num_classes)
-    model = create_transfer_model(num_classes, input_shape=input_shape) # MobileNetV2
-    # model = create_transfer_model_efficientnet(num_classes, input_shape=input_shape) #EfficientNetB0
+    model = create_transfer_model(num_classes, input_shape=input_shape)
 
     model.compile(optimizer='adam',
-                loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False), # Gebruik SC_Crossentropy voor integer labels
+                loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
                 metrics=['accuracy'])
 
     model.summary()
@@ -167,9 +134,7 @@ if __name__ == "__main__":
     images = load_images("fullset")
 
     apply_deep_learning(images)
-    # apply_machine_learning()
-    # random_forest_predict()
-
+    apply_machine_learning(images)
     
     # test_random_forest_with_gui()
     # test_cnn_model_with_gui()

@@ -1,16 +1,13 @@
 from featureExtraction.aspectRatio import compute_aspect_ratio
 from featureExtraction.blockHistogram import compute_block_histogram
 from featureExtraction.centerOfMass import compute_center_of_mass
-from featureExtraction.dct import compute_dct_features
 from featureExtraction.euclidianDistance import compute_euclidian_distance
 from featureExtraction.colorPercentage import compute_color_percentage
-from featureExtraction.hog import compute_hog_features
 from featureExtraction.hueVariance import compute_hue_variance
 from featureExtraction.colorDiversity import compute_color_diversity
 from featureExtraction.uniqueHues import compute_unique_hues
 from featureExtraction.standardDeviation import compute_color_std
 from featureExtraction.numberOfSquares import count_number_of_colored_squares, count_number_of_squares
-from featureExtraction.orb import compute_orb_features
 
 def extract_features(i, name, class_name, img, red_mask, yellow_mask, blue_mask) -> dict[str, float]:
     aspect_ratio, center, diagonal = compute_aspect_ratio(img, False) 
@@ -37,15 +34,8 @@ def extract_features(i, name, class_name, img, red_mask, yellow_mask, blue_mask)
 
     number_of_colored_squares = count_number_of_colored_squares(img, red_mask, yellow_mask, blue_mask, 0, False)
     number_of_squares = count_number_of_squares(img, 0, False)
-    #orb = compute_orb_features(img, False)
-    #hog_vec = compute_hog_features(img, False).flatten()
-    #dct_vec = compute_dct_features(img)
     hist_vec = compute_block_histogram(img)
 
-
-    #orb_features = {f"orb_{k}": float(v) for k, v in enumerate(orb)}
-    #hog_features = {f"hog_{k}": float(v) for k, v in enumerate(hog_vec)}
-    #dct_features = {f"dct_{k}": float(v) for k, v in enumerate(dct_vec)}
     hist_features = {f"hist_{k}": float(v) for k, v in enumerate(hist_vec)}
 
     features = {
@@ -67,11 +57,7 @@ def extract_features(i, name, class_name, img, red_mask, yellow_mask, blue_mask)
         "blue_std": blue_std,
         "number_of_colored_squares": number_of_colored_squares,
         "number_of_squares": number_of_squares,
-    #    **orb_features,
-    #    **hog_features,
-    #    **dct_features,
         **hist_features,
-
     }
 
     return features
