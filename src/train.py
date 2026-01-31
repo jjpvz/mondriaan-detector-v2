@@ -1,8 +1,12 @@
 import argparse
 import keras
+import numpy as np
 import pandas as pd
 import joblib
 import configparser
+import tensorflow as tf
+
+from sklearn.utils import compute_class_weight
 
 from deep_learning.analyze.print_specification_report import print_specification_report
 from deep_learning.augment_images import augment_images as augment_images_for_dl
@@ -19,7 +23,12 @@ from machine_learning.preprocessing.pipeline import preprocess_image
 from machine_learning.segmentation.colorSegmentation import segment_colors
 from machine_learning.train_model import gridsearch_RF, train_random_forest
 
+from transfer_learning.transfer_learning_model import finetune_mobilenetv2, transfer_learning_model
+
 def train_ml_model():
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    
     images = load_images("fullset")
 
     features_list = [] 
@@ -51,7 +60,7 @@ def train_ml_model():
 
     model_rm = train_random_forest(dataframe)
 
-    joblib.dump(model_rm, config['General']['RF_Model_path'])
+    joblib.dump(model_rm, config['General']['ml_path'])
 
 def train_dl_model():
     config = configparser.ConfigParser()
@@ -88,13 +97,80 @@ def train_dl_model():
     plot_confusion_matrix(y_val, y_pred, train_ds)
 
 def train_tl_model():
-    print("not implemented yet")
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    fullset = config['General']['fullset_path']
+    model_path = config['General']['tl_path']
+
+    image_size = (224, 224)
+    batch_size = 32
+
+    train_ds, val_ds = keras.utils.image_dataset_from_directory(
+        fr"{fullset}",
+        validation_split=0.2,
+        subset="both",
+        seed=1337,
+        image_size=image_size,
+        batch_size=batch_size,
+    )
+
+    augmentation = augment_images_for_dl()
+
+    input_shape = image_size + (3,)
+    num_classes = len(train_ds.class_names)
+
+    class_labels = np.concatenate([y for x, y in train_ds], axis=0)
+    class_weights_array = compute_class_weight( class_weight='balanced', classes=np.unique(class_labels), y=class_labels)
+    class_weights = dict(enumerate(class_weights_array))
+
+    model = transfer_learning_model(
+            input_shape=input_shape,
+            num_classes=num_classes,
+            augmentation=augmentation,
+            dense_units=256,
+            dropout=0.3,
+            lr=1e-4
+        )
+    
+    callbacks_initial = [
+        tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=5, restore_best_weights=True),
+        tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=3, min_lr=1e-7)
+    ]
+
+    model.fit(
+        train_ds, 
+        validation_data=val_ds, 
+        epochs=20,
+        callbacks=callbacks_initial,
+        class_weight=class_weights
+    )
+    
+    model = finetune_mobilenetv2(model, fine_tune_at=120, lr=1e-5)
+    callbacks_ft = [
+        tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=5, restore_best_weights=True),
+        tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=3, min_lr=1e-7)
+    ]
+    
+    model.fit(
+        train_ds, 
+        validation_data=val_ds, 
+        epochs=30,
+        callbacks=callbacks_ft,
+        class_weight=class_weights
+    )
+
+    model.save(model_path)
+
+    y_val, y_pred = get_predictions(model, val_ds)
+
+    print_specification_report(y_val, y_pred, train_ds)
+    plot_confusion_matrix(y_val, y_pred, train_ds)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train ML en DL modellen.")
     parser.add_argument(
         'model', 
-        choices=['ml', 'dl', 'ts'], 
+        choices=['ml', 'dl', 'tl'], 
         help="Welk model wil je trainen? 'ml' voor Random Forest, 'dl' voor CNN, of 'tl' voor MobileNetV2."
     )
 

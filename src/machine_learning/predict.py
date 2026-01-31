@@ -320,7 +320,7 @@ def load_model(mode: Literal["RF_model"]):
         raise configparser.NoSectionError("General")
 
     if mode.lower() == "rf_model":
-        model_path = (project_root / config.get("General", "RF_Model_path")).resolve()
+        model_path = (project_root / config.get("General", "ml_path")).resolve()
 
     if not model_path.exists():
         raise FileNotFoundError(f"Model file not found: {model_path}")

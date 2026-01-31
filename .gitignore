@@ -1,6 +1,7 @@
 data/*
 temp/*
-mondriaan_detector_dl.keras
+models/* 
+
 config.ini
 
 # Byte-compiled / optimized / DLL files

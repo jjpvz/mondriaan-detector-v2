@@ -14,7 +14,7 @@ def load_images(mode: Literal["subset", "fullset"] = "subset",
     if mode not in {"subset", "fullset"}:
         raise ValueError(f"Invalid mode '{mode}'. Expected 'subset' or 'fullset'.")
 
-    project_root = Path(__file__).resolve().parents[2]
+    project_root = Path(__file__).resolve().parents[3]
     config_path = project_root / "config.ini"
 
     if not config_path.exists():
