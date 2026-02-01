@@ -164,13 +164,13 @@ def apply_deep_learning(images):
     model.save("mobilenetv2_mondriaan_model.keras")
 
 if __name__ == "__main__":
-    images = load_images("fullset")
+    # images = load_images("fullset")
 
-    apply_deep_learning(images)
+    # apply_deep_learning(images)
     # apply_machine_learning()
     # random_forest_predict()
 
     
     # test_random_forest_with_gui()
-    # test_cnn_model_with_gui()
+    test_cnn_model_with_gui()
 
