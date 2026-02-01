@@ -8,7 +8,11 @@ Dit project bevat drie verschillende benaderingen voor het classificeren van Mon
 
 ```
 python -m venv venv
-.\venv\Scripts\Activate.ps1
+.\venv\Scripts\Activate.ps1 
+
+Gebruik .ps1 voor powershell
+Gebruik .bat voor command prompt
+Laat leeg voor bash/linux/mac
 ```
 
 2\. Dependencies installeren:
