@@ -1,4 +1,7 @@
 data/*
+temp/*
+models/* 
+
 config.ini
 
 # Byte-compiled / optimized / DLL files

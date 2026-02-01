@@ -1,64 +1,115 @@
 # Mondriaan Detector v2
 
-## Getting Started
+Dit project bevat drie verschillende benaderingen voor het classificeren van Mondriaan-stijlen: Machine Learning (Random Forest), Deep Learning (Custom CNN), en Transfer Learning (MobileNetV2)
 
-Follow these steps to set up and run the project.
+## 1. Setup & installatie
 
-1\. Create a virtual environment
+1\. Virtual Environment opzetten:
 
 ```
 python -m venv venv
+.\venv\Scripts\Activate.ps1
 ```
 
-2\. Activate the virtual environment (from project root)
-
-Windows (PowerShell):
-
-```
-venv\Scripts\Activate.ps1
-```
-
-3\. Install dependencies
+2\. Dependencies installeren:
 
 ```
 pip install -r requirements.txt
 ```
 
-4\. Create the configuration file
+3\. Configuratie instellen: Maak een config.ini aan in de project root.
 
 Create a config.ini file in the project root:
 
 ```
 # config.ini
 [General]
+fullset_path = data/dataset
 subset_path = data/subset
-fullset_path = data/fullset
+csv_path = temp/dataframe
+texts_csv_path = testing/texts.csv
+ml_path = models/mondriaan_detector_ml.joblib
+dl_path = models/mondriaan_detector_dl.keras
+tl_path = models/mondriaan_detector_tl.keras
 ```
 
-- `subset_path` points to a small subset of images for testing.
-- `fullset_path` points to the full dataset.
+## 2. Project flow & gebruik
 
-5\. Prepare your dataset
+Het project is opgesplitst in twee fases: trainen en testen.
 
-```
-data/
-├─ fullset/
-│  ├─ M01/
-│  │  ├─ M1 (1).JPG
-│  │  ├─ M1 (2).JPG
-│  │  └─ ...
-│  ├─ M02/
-│  │  └─ ...
-│  └─ ...
-└─ subset/
-   ├─ subset/
-   │  ├─ 1 (1).JPG
-   │  ├─ mondriaan1 (1).JPG
-   │  └─ ...
-```
+### Fase A: Modellen trainen (train.py)
 
-6\. Run the main script (from project root)
+Gebruik dit script om de modellen te genereren. Je kunt kiezen welk specifiek model je wilt trainen.
+
+Train machine learning model:
 
 ```
-python src/main.py
+python src/train.py ml
 ```
+
+Train deep learning model:
+
+```
+python src/train.py dl
+```
+
+Train transfer learning model:
+
+```
+python src/train.py tl
+```
+
+### Fase B: Modellen testen met GUI (test.py)
+
+Gebruik dit script om de gegeneerde modellen te testen. Je kunt kiezen welk specifiek model je wilt testen.
+
+Train machine learning model:
+
+```
+python src/test.py ml
+```
+
+Train deep learning model:
+
+```
+python src/test.py dl
+```
+
+Train transfer learning model:
+
+```
+python src/test.py tl
+```
+
+### 3. Systeem configuratie
+
+#### 1. Software Requirements
+
+- Windows 11
+- Python 3.11.9
+- Vereiste Python-pakketten (zie requirements.txt)
+
+#### 2. Hardware Requirements
+
+- Minimaal 8 GB RAM
+- Minimaal 4-core CPU
+- Opslagruimte: Minimaal 2 GB
+
+## 4. Dataset acquisitie
+
+Er zijn twee manieren om de benodigde data te verkrijgen:
+
+### Optie A: Geautoriseerde toegang
+
+- Locatie: De data is opgeslagen in een beveiligde OneDrive-omgeving
+  [OneDrive Dataset Link](https://hannl-my.sharepoint.com/my?id=%2Fpersonal%2Fjjp%5Fvanzwol%5Fstudent%5Fhan%5Fnl%2FDocuments%2FEVML%2FFoto&viewid=2a1c220c%2D5c35%2D4559%2Da5da%2D77e30261edc9).
+- Installatie na autorisatie:
+  1.  Download het gedeelde ZIP-bestand.
+  2.  Pak de inhoud uit in de data/ folder van de projectroot.
+  3.  Controleer of de paden in config.ini overeenkomen met je lokale opslaglocatie.
+
+### Optie B: Zelfstandige acquisitie
+
+Je kunt zelf een dataset samenstellen om de robuustheid van de code te testen.
+
+- Instructies: Volg hiervoor de gedetailleerde stappen en criteria zoals beschreven in de onderzoeksverslagen. Deze documenten zijn hier te vinden: [Machine learning onderzoeksverslag](docs/ml_verslag.pdf) & [Deep learning onderzoeksverslag](docs/dl_verslag.pdf).
